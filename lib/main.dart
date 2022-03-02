@@ -5,7 +5,10 @@ import 'drawer.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'services.dart';
-
+import 'services_drawer.dart';
+import 'drop.dart';
+import 'login_screen.dart';
+import 'list_todo_list.dart';
 class _MyInherited extends InheritedWidget {
   _MyInherited({
     Key key,
@@ -79,11 +82,13 @@ class _main_app_state extends State<main_app>{
       home:Scaffold(
           appBar: AppBar(
             centerTitle: true,
-            title: Text('Задачи на сегодня'),
+            title: Text('Ваши задачи'),
             backgroundColor: Colors.green[600],
           ),
-          body: App(),
-          drawer:
+          body: Center(
+    child: Image.asset('1.png', width: 200, height: 200)),
+
+    drawer:
           /*MyInheritedWidget(
               child:*/
               SlideBarMenuContent_drawer()
@@ -95,13 +100,13 @@ class _main_app_state extends State<main_app>{
 void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
-
+  await db_list.init();
+  await DB.init();
   runApp(
       MaterialApp(
           initialRoute: '/p1',
           routes: {
             '/p1':(BuildContext context) => main_app(),
-
           }
       ));
 }

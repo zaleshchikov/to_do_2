@@ -18,7 +18,7 @@ class User{
     return {'name': name, 'email': email};}
 
     @override  String toString() {
-      return 'Dog{name: $name, email: $email}';
+      return 'User{name: $name, email: $email}';
     }
 
 }

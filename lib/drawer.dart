@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'pages/p1.dart';
+import 'services_drawer.dart';
+import 'header.dart';
+import 'list_todo_list.dart';
+/*import 'pages/p1.dart';
 import 'pages/p2.dart';
 import 'pages/p3.dart';
 import 'pages/p4.dart';
@@ -8,30 +11,88 @@ import 'pages/p6.dart';
 import 'pages/p7.dart';
 import 'pages/p8.dart';
 import 'pages/p9.dart';
-import 'pages/p10.dart';
+import 'pages/p10.dart';*/
 import 'services.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'page.dart';
 class SlideBarMenuContent_drawer extends StatefulWidget {
 
   @override
   _SlideBarMenuContentState createState() => _SlideBarMenuContentState();
 }
 
-
-
 class _SlideBarMenuContentState extends State<SlideBarMenuContent_drawer>{
+
+  void _save_page(index) async {
+
+    list_of_lists list = list_of_lists(list:list_page_task.join(' '), is_selected: list_page_bool.join(' '), id: index);
+    if (list_page_task != []) {await db_list.update_page(list_of_lists.table, list);
+    setState(() {} );
+    refresh_page();}
+  }
+
+  void _insert_page(index) async {
+
+    list_of_lists list = list_of_lists(list:null, is_selected: null, id: index);
+    await db_list.insert_page(list_of_lists.table, list);
+    refresh_page();
+  }
+
+  //List lists_ = [list_of_lists(list: ['Молоко', 'Сметана', 'Мёд']), list_of_lists(list: ['Молоко', 'Сметана', 'Мёд']), list_of_lists(list: ['Молоко', 'Сметана', 'Мёд'])];
+
+  void refresh_page() async {
+    List<Map<String, dynamic>> _results = await db_list.query(list_of_lists.table);
+    lists_ = _results.map((item) => list_of_lists.fromMap(item)).toList();
+    setState(() { });
+  }
+
+
   final myController = TextEditingController();
   FocusNode myFocusNode = FocusNode();
 
+  String _task;
 
-  @override
-  void initState() {
-    super.initState();
+  TodoItem item1 = TodoItem(task: 'Важно');
+  TodoItem item2 = TodoItem(task: 'Мои планы');
+  TodoItem item3 = TodoItem(task: 'Завтрашний день');
+  List<TodoItem> _tasks = [TodoItem(task: 'Важно'), TodoItem(task: 'Мои планы'), TodoItem(task: 'Завтрашний день')];
+
+  void refresh() async {
+    List <Map<String, dynamic>> _results = await DB.query(TodoItem.table);
+    _tasks = (_results.map((item) => TodoItem.fromMap(item)).toList());print(_task);
+    setState(() { });
   }
 
+  void refresh_first() async {
+    List <Map<String, dynamic>> _results = await DB.query(TodoItem.table);
+    _tasks = [TodoItem(task: 'Важно'), TodoItem(task: 'Мои планы'), TodoItem(task: 'Завтрашний день')];
+    setState(() { });
+  }
+
+  void len() {
+    if (lists_.length <= 10){
+      for (int i = lists_.length-1;i <= 9; i++){
+        lists_.add(list_of_lists(list:''));
+      }
+    }
+  }
+
+  @override
+  void initState(){
+    print(index_page);
+    index_page != null? _save_page(index_page): null;
+    refresh_page();
+    refresh();
+    len();
+    super.initState();
+    refresh();
+  }
+
+
+  List<String> lsitOfTask = ["Корова", "Молок","Мёд"];
   List <String> name_of_tile = ['Важно', 'Мои планы', 'Завтрашний день'];
-  Widget make_page(ind){
+  /*Widget make_page(ind){
     if (ind == 0){
       return page1(name_of_tile[ind]);
     };
@@ -62,13 +123,31 @@ class _SlideBarMenuContentState extends State<SlideBarMenuContent_drawer>{
     if (ind == 9){
       return page10(name_of_tile[ind]);
     };
-  }
+  }*/
 
 
-  List <IconData> icon_of_tile = [Icons.beach_access, Icons.add_a_photo, Icons.favorite];
+  List <IconData> icon_of_tile = [Icons.beach_access, Icons.add_a_photo, Icons.favorite, Icons.favorite, Icons.favorite, Icons.favorite, Icons.favorite, Icons.favorite, Icons.favorite,Icons.favorite, Icons.favorite, Icons.favorite, Icons.favorite, Icons.favorite];
   String _userToDo;
 
-  void add_new_name()  {
+
+  void _save() async {
+    if(_userToDo != null){
+    TodoItem item = TodoItem(
+        task: _userToDo,
+    );
+
+    await DB.insert(TodoItem.table, item);
+    setState(() {
+    } );
+    refresh();}
+  }
+
+  void add_new_name() async{
+    /*TodoItem item = TodoItem(
+        task: _userToDo,
+    );
+    print(_userToDo);
+    await DB.insert(TodoItem.table, item);*/
     setState(() {
       if(_userToDo != null){
         icon_of_tile.add(Icons.beach_access);
@@ -76,10 +155,28 @@ class _SlideBarMenuContentState extends State<SlideBarMenuContent_drawer>{
       });
     }
 
+  _update(index) async {
+
+    // get a reference to the database
+    // because this is an expensive operation we use async and await
+
+    // row to update
+    list_of_lists list_2 = list_of_lists(list:list_page_task.join(' '), is_selected: list_page_bool.join(' '));
+
+    // We'll update the first row just as an example
+    dynamic result = await db_list.update_page(TodoItem.table, list_2);
+    // do the update and get the number of affected rows
+
+    // show the results: print all rows in the db
+    print(db_list.query(list_of_lists.table));
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(
+    return
+      Drawer(
         child:
         SingleChildScrollView(
             child:
@@ -96,13 +193,13 @@ class _SlideBarMenuContentState extends State<SlideBarMenuContent_drawer>{
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
                       padding: const EdgeInsets.all(8),
-                      itemCount: name_of_tile.length,
+                      itemCount: _tasks.length,
                       itemBuilder: (context, index) {
                         return ListTile(
                           title:
                           Row(
                               children: [
-                                Text('${name_of_tile[index]}',
+                                Text('${_tasks[index].task}',
                                     style: TextStyle(color: Colors.green, fontSize: 15)
                                 ),
                                 Padding(
@@ -114,15 +211,32 @@ class _SlideBarMenuContentState extends State<SlideBarMenuContent_drawer>{
                                     )),
                               ]),
                           onTap: () {
+                            index_page = index;
+                            //lists_[index] = list_of_lists(list: list_page);
+                            //_toggle(lists_[index]);
+                            list_page_task = [];
+                            list_page_bool = [];
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => make_page(index),)
+                              MaterialPageRoute(builder: (context) => MaterialApp(
+                                  home:
+                                  Scaffold(
+                                      appBar: AppBar(
+                                        centerTitle: true,
+                                        title: Text('${_tasks[index].task}'),
+                                        backgroundColor: Colors.green[600],
+                                      ),
+                                      body:
+                                      Home(todoList: lists_[index].list, isCheck: lists_[index].is_selected,),
+                                      drawer: SlideBarMenuContent_drawer()
+                                  )
+                              ),)
                             );
                           },
                         );
                       }),
                   Padding(
-                    padding: EdgeInsets.all(16.0),
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
                     child:
                     ElevatedButton(
                         style: ElevatedButton.styleFrom(
@@ -144,13 +258,13 @@ class _SlideBarMenuContentState extends State<SlideBarMenuContent_drawer>{
       content:SingleChildScrollView(    // new line
           child:
            Container(
-          height: MediaQuery.of(context).size.height/3.6,
+          height: MediaQuery.of(context).size.height/4.5+6,
           child:
       Column(
         mainAxisSize: MainAxisSize.min,
               children: [
                 Padding(
-                  padding: EdgeInsets.only(top:3),
+                  padding: EdgeInsets.only(top:0),
                 child: TextFormField(
                   controller: myController,
                   focusNode: myFocusNode,
@@ -161,26 +275,31 @@ class _SlideBarMenuContentState extends State<SlideBarMenuContent_drawer>{
                       enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey, width: 2.0)),
                       labelText: 'Наименование',
                       labelStyle: TextStyle(color: myFocusNode.hasFocus ? Colors.grey : Colors.grey)),)),
-                Padding(padding:  EdgeInsets.only(left:6),
+                Padding(padding:  EdgeInsets.only(left:16),
                     child: Row(
                         children: [
                           Text('Выберете эмблему:', style: TextStyle(color: Colors.grey[700], fontSize: 12)),
-                          Padding(padding:  EdgeInsets.only(left:16),
+                          Padding(padding:  EdgeInsets.only(left:6),
                               child: drop_icon())])),
                 /*Row(
             children: [*/
                 Container(
-                    padding: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.only(right: 68),
                     width: MediaQuery.of(context).size.width/1.8,
-                    child: Text('Цвет эмблемы:',style: TextStyle(color: Colors.grey[700], fontSize: 12), textAlign: TextAlign.left)),
-                Container(
+                    child:
+                    Row(
+                      children: [
+                    Text('Цвет эмблемы:',style: TextStyle(color: Colors.grey[700], fontSize: 12), textAlign: TextAlign.center),
+                    Container(color: Colors.green[600], height: 11, width: 15)
+                      ])),
+                /*Container(
                     width: MediaQuery.of(context).size.width/1.8,
-                    child: Text('Цвет текста:',style: TextStyle(color: Colors.grey[700], fontSize: 12), textAlign: TextAlign.left))
+                    child: Text('Цвет текста:',style: TextStyle(color: Colors.grey[700], fontSize: 12), textAlign: TextAlign.left))*/
               ]
           )
       )),
       actions: [
-        ElevatedButton(
+        TextButton(
           style: ElevatedButton.styleFrom(
             primary: Colors.green[600], // background
             onPrimary: Colors.white,
@@ -195,25 +314,28 @@ class _SlideBarMenuContentState extends State<SlideBarMenuContent_drawer>{
             _userToDo = null;
           },
         ),
-        ElevatedButton(
+        TextButton(
     style: ElevatedButton.styleFrom(
     primary: Colors.green[600], // background
       onPrimary: Colors.white,
       shape: new RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20.0),
+                  borderRadius: BorderRadius.circular(20.0),
       ),// foreground
     ),
-          child: Text("Сохранить"),
-          onPressed:  () {
-            add_new_name();
-            Navigator.pop(context);
-            myController.text = '';
-            _userToDo = null;
-          },
-        ),
-      ],
-    );});
-    },
+                    child: Text("Сохранить"),
+                    onPressed:  () {
+      print(lists_.length);
+                      _insert_page((lists_.length != null? lists_.length: 0));
+                      _save();
+                      add_new_name();
+                      Navigator.pop(context);
+                      myController.text = '';
+                      _userToDo = null;
+                    },
+            )],
+        //buttonPadding: EdgeInsets.zero
+        );
+    });},
                         child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children:
@@ -230,69 +352,6 @@ class _SlideBarMenuContentState extends State<SlideBarMenuContent_drawer>{
                 ])));
   }}
 
-  class Header extends StatefulWidget {
-    const Header({Key key}) : super(key: key);
-
-    @override
-    _HeaderState createState() => _HeaderState();
-  }
-
-
-
-class _HeaderState extends State<Header>{
-
-  DatabaseHandler handler;
-
-  @override
-  void initState() {
-    super.initState();
-    this.handler = DatabaseHandler();
-    this.handler.initializeDB().whenComplete(() async {
-      await this.addUsers();
-      setState(() {});
-    });}
-
-    Future<int> addUsers() async {
-      User firstUser = User(name: "Сашок", email: 'zaleshchikovaa@gmail.com');
-      List<User> listOfUsers = [firstUser];
-      return await this.handler.insertUser(listOfUsers);
-    }
-  String user_email = 'zaleshchikovaa@gmail.com';
-  String user_name = 'Сашок';
-
-  @override
-  Widget build(BuildContext context) {
-    return
-      FutureBuilder(
-        future: this.handler.retrieveUsers(),
-    builder: (BuildContext context, AsyncSnapshot<List<User>> snapshot)  {
-    if (snapshot.hasData) {
-      return Column(
-        children: [
-          Center(
-              child: CircleAvatar(
-                  radius: 45,
-                  backgroundColor: Colors.white
-                /*child: ClipOval(
-              ),*/
-              )),
-          Container(
-              margin: EdgeInsets.only(top: 5, bottom:5),
-              child:
-              Text('${snapshot.data[0].name}',
-                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w400))),
-          Container(
-              margin: EdgeInsets.only(top: 0.0, bottom:0.0),
-              child:
-              Text('${snapshot.data[0].email}',
-                  style: TextStyle(color: Colors.white, fontSize: 10)))
-        ]
-    );} else {
-    return Center(child: CircularProgressIndicator());
-    }
-  });
-  }
-}
 
 class drop_icon extends StatefulWidget {
   @override
@@ -304,24 +363,38 @@ class drop_icon_state extends State<drop_icon> {
 
   @override
   Widget build(BuildContext context) {
-    return DropdownButton<String>(value: dropdownValue, icon: const Icon(Icons.arrow_downward), elevation: 16,
-      style: const TextStyle(color: Colors.deepPurple),
-      underline: Container(
-        height: 2,
-        color: Colors.deepPurpleAccent,
-      ),
-      onChanged: (String newValue) {
+    return Container(
+        width: 44,
+        height: 50,
+      child: DropdownButton<Item>(
+      hint:  Icon(Icons.android,color: Colors.green[600], size: 20),
+      onChanged: (Item Value) {
         setState(() {
-          dropdownValue = newValue;
         });
       },
-      items: <String>['One', 'Two', 'Free', 'Four']
-          .map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
+      items: users.map((user) {
+        return  DropdownMenuItem<Item>(
+          value: user,
+          child: Row(
+            children: <Widget>[
+              user.icon,
+            ],
+          ),
         );
       }).toList(),
-    );
+    ));
   }
 }
+
+class Item {
+  const Item(this.name,this.icon);
+  final String name;
+  final Icon icon;
+}
+
+  List users = [
+    const Item('Android',Icon(Icons.beach_access, color: Colors.green, size: 20)),
+    const Item('Flutter',Icon(Icons.add_a_photo,color:  Colors.green, size: 20)),
+    const Item('ReactNative',Icon(Icons.favorite,color:  Colors.green, size: 20)),
+    const Item('iOS',Icon(Icons.flag,color:  Colors.green,size: 20)),
+  ];
