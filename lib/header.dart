@@ -20,7 +20,7 @@ class _HeaderState extends State<Header>{
     super.initState();
     this.handler = DatabaseHandler();
     this.handler.initializeDB().whenComplete(() async {
-      await this.addUsers();
+      //await addUsers();
       setState(() {});
     });}
 

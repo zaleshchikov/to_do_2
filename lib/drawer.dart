@@ -1,21 +1,9 @@
 import 'package:flutter/material.dart';
-import 'services_drawer.dart';
+
 import 'header.dart';
 import 'list_todo_list.dart';
-/*import 'pages/p1.dart';
-import 'pages/p2.dart';
-import 'pages/p3.dart';
-import 'pages/p4.dart';
-import 'pages/p5.dart';
-import 'pages/p6.dart';
-import 'pages/p7.dart';
-import 'pages/p8.dart';
-import 'pages/p9.dart';
-import 'pages/p10.dart';*/
-import 'services.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
 import 'page.dart';
+import 'services_drawer.dart';
 class SlideBarMenuContent_drawer extends StatefulWidget {
 
   @override

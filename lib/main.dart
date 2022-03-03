@@ -68,6 +68,28 @@ class main_app extends StatefulWidget {
   _main_app_state createState() => _main_app_state();
 }
 
+class login extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home:Scaffold(
+        /*appBar: AppBar(
+            centerTitle: true,
+            title: Text('Ваши задачи'),
+            backgroundColor: Colors.green[600],
+          ),*/
+        body: Center(child: login_screen()),
+
+        /*drawer:
+          /*MyInheritedWidget(
+              child:*/
+              SlideBarMenuContent_drawer()*/
+      ), // <- сюда надо будет добавить примеры из статьи
+    );
+  }
+}
+
 
 class _main_app_state extends State<main_app>{
 
@@ -85,8 +107,7 @@ class _main_app_state extends State<main_app>{
             title: Text('Ваши задачи'),
             backgroundColor: Colors.green[600],
           ),
-          body: Center(
-    child: Image.asset('1.png', width: 200, height: 200)),
+          body: Center(),
 
     drawer:
           /*MyInheritedWidget(
@@ -106,7 +127,7 @@ void main() async {
       MaterialApp(
           initialRoute: '/p1',
           routes: {
-            '/p1':(BuildContext context) => main_app(),
+            '/p1':(BuildContext context) => login(),
           }
       ));
 }
